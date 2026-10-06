@@ -1,0 +1,10 @@
+{
+    ".heic" : "HEIC",
+    "jpg" : "JPEG",
+    "jpeg" : "JPEG",
+    "png" : "PNG",
+    "tiff" : "TIFF",
+    "bmp" : "BMP",
+    "gif" : "GIF",
+    "webp" : "WEBP"
+}
