@@ -1,21 +1,12 @@
 import convertor
-from tkinter import Tk, filedialog
+import select_path
 import os
+from pathlib import Path
 
-def destination_folder():
-    root = Tk()
-    root.withdraw()
-    root.attributes('-topmost', True)
-    destination_folder = filedialog.askdirectory(title="Select Destination Folder")
-    root.destroy()
-    return destination_folder
-
-
-def select_file():
-    root = Tk()
-    root.withdraw()
-    root.attributes('-topmost', True)
-    file_paths = filedialog.askopenfilenames(title="Select Files", filetypes=[("Image Files", "*.heic *.jpg *.jpeg *.png *.tiff *.bmp *.gif *.webp")])
-    root.destroy()
-    return file_paths
-
+def print_instructions():
+    print("Image Format Converter")
+    print("For instructions : help")
+    print("To exit : exit or e")
+    print("Select a file to convert : file")
+    print("Select a folder to convert : folder")
+    print("Select a destination folder : destination")

@@ -1,4 +1,5 @@
 {
+    "Formats" :{
     ".heic" : "HEIC",
     "jpg" : "JPEG",
     "jpeg" : "JPEG",
@@ -7,4 +8,6 @@
     "bmp" : "BMP",
     "gif" : "GIF",
     "webp" : "WEBP"
+    }
 }
+
