@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from pillow_heif import register_heif_opener
 from pathlib import Path
 import json
@@ -9,34 +9,99 @@ with open('C:\\Programming\\Mini_Projects\\mini_projects\\Image_convertor\\confi
     config = json.load(config_file)
 
 class Picture:
-    def __init__(self, input_file_or_path, output_file_or_path):
-        self.file = Path(input_file_or_path)
-        self.output_path = Path(output_file_or_path)
-        self.name = os.path.join(self.output_path, self.file.stem)
 
-    def check_format(self):
-        return config["Formats"].get(self.file.suffix.lower())
+    def __init__(self, input_tuple : tuple[os.PathLike[str]], destination_folder : os.PathLike[str], conversion_to : str):
+        self.input_tuple = input_tuple
+        self.destination = destination_folder
+        self.conversion = config["Formats"].get(str(conversion_to).lower().lstrip('.'))
+        
 
-    def convert_to_tiff(self):
-        if self.file.is_file():
-            with Image.open(self.file) as img:
+        # checking if the conversion format is valid
+        if self.conversion == None:
+            raise ValueError(f"Unsupported conversion format: {conversion_to}")
+
+
+    @staticmethod
+    def check_format(file) -> str | None:
+        path = Path(file)
+        return config["Formats"].get(path.suffix.lower().lstrip('.'))
+
+    @staticmethod
+    def convert_image(i_name, o_name, format):
+        options = {
+            'JPEG': {'quality': 100},
+            'TIFF': {'compression' : 'tiff_lzw'},
+            'PNG' : {},
+            'HEIC' : {'quality': 100}
+        }
+
+        save_options = options[format]
+
+        try:
+            with Image.open(i_name) as img:
                 exif_data = img.info.get('exif')
-                img.save(self.name, format='TIFF', compression = "tiff_lzw", exif = exif_data)
+                img.save(o_name, format=format, exif=exif_data, **save_options)
+                print(f'{o_name} Saved!!')
+                return
 
-    def convert_to_jpeg(self, lossless=False):
-        with Image.open(self.file) as img:
-            exif_data = img.info.get('exif')
-            if lossless:
-                img.save(self.name, format='JPEG', quality=100, exif = exif_data)
-            else:
-                img.save(self.name + '.jpeg', format='JPEG', quality=85)
+        except (UnidentifiedImageError, OSError, SyntaxError) as e:
+            print(f"An error occured: {e}")
+    '''
+    @staticmethod
+    def convert_image(i_name, o_name, format):
 
-    def convert_to_png(self):
-        with Image.open(self.file) as img:
-            exif_data = img.info.get('exif')
-            img.save(self.name, format='PNG', exif = exif_data)
+        if format == 'JPEG':
+            with Image.open(i_name) as img:
+                exif_data = img.info.get('exif')
+                img.save(o_name, format=format, quality=100, exif=exif_data)
+                print(f"{o_name} Saved!!")
+                return
 
-    def convert_to_heic(self):
-        with Image.open(self.file) as img:
-            exif_data = img.info.get('exif')
-            img.save(self.name, format='HEIC', quality=100, exif = exif_data)
+        elif format == 'TIFF':
+            with Image.open(i_name) as img:
+                exif_data = img.info.get('exif')
+                img.save(o_name, format=format, compression='tiff_lzw', exif=exif_data)
+                print(f"{o_name} Saved!!")
+
+        elif format == 'PNG':
+            with Image.open(i_name) as img:
+                exif_data = img.info.get('exif')
+                img.save(o_name, format=format, exif=exif_data)
+                print(f"{o_name} Saved!!")
+
+        elif format == 'HEIC':
+            with Image.open(i_name) as img:
+                exif_data = img.info.get('exif')
+                img.save(o_name, format=format, quality = 100, exif=exif_data)
+                print(f"{o_name} Saved!!")
+    '''
+
+    def convert(self):
+
+        if isinstance(self.input_tuple, tuple):
+            for f in self.input_tuple:
+                if f.is_dir():
+                    for file in f.iterdir():
+                        if self.check_format(file) is not None:
+                            o_name = os.path.join(self.destination, file.name)
+                            o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
+                            self.convert_image(file, o_name,  self.conversion)
+
+                        else:
+                            print(f"Invalid file: {file}")
+
+
+                if f.is_file():
+                    if self.check_format(file=f) is not None:
+                        o_name = os.path.join(self.destination, f.name)
+                        o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
+                        self.convert_image(f, o_name, self.conversion)
+
+                    else:
+                        print(f"Invalid File: {f}")
+
+
+        return
+
+
+    

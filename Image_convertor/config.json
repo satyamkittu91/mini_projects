@@ -1,6 +1,6 @@
 {
     "Formats" :{
-    ".heic" : "HEIC",
+    "heic" : "HEIC",
     "jpg" : "JPEG",
     "jpeg" : "JPEG",
     "png" : "PNG",
@@ -8,6 +8,16 @@
     "bmp" : "BMP",
     "gif" : "GIF",
     "webp" : "WEBP"
+    },
+
+    "Conversion" : {
+    "HEIC" : ".heic",
+    "JPEG" : ".jpeg",
+    "PNG" : ".png",
+    "TIFF" : ".tiff",
+    "BMP" : ".bmp",
+    "GIF" : ".gif",
+    "WEBP" : ".webp"
     }
 }
 

@@ -1,4 +1,4 @@
-import convertor
+import mini_projects.Image_convertor.convertor_old as convertor_old
 import select_path
 import os
 from pathlib import Path
