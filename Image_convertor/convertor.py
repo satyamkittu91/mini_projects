@@ -80,15 +80,16 @@ class Picture:
 
         if isinstance(self.input_tuple, tuple):
             for f in self.input_tuple:
-                if f.is_dir():
-                    for file in f.iterdir():
-                        if self.check_format(file) is not None:
-                            o_name = os.path.join(self.destination, file.name)
-                            o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
-                            self.convert_image(file, o_name,  self.conversion)
+                f = Path(f)
+                # if f.is_dir():
+                #     for file in f.iterdir():
+                #         if self.check_format(file) is not None:
+                #             o_name = os.path.join(self.destination, file.name)
+                #             o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
+                #             self.convert_image(file, o_name,  self.conversion)
 
-                        else:
-                            print(f"Invalid file: {file}")
+                #         else:
+                #             print(f"Invalid file: {file}")
 
 
                 if f.is_file():
@@ -100,6 +101,32 @@ class Picture:
                     else:
                         print(f"Invalid File: {f}")
 
+        if isinstance(self.input_tuple, Path):
+            f = self.input_tuple
+            if f.is_file():
+                if self.check_format(file=f) is not None:
+                    o_name = os.path.join(self.destination, f.name)
+                    o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
+                    self.convert_image(f, o_name, self.conversion)
+
+                else:
+                    print(f"Invalid File: {f}")
+
+            elif f.is_dir():
+                for file in f.iterdir():
+                    if self.check_format(file) is not None:
+                        o_name = os.path.join(self.destination, file.name)
+                        o_name = Path(o_name).with_suffix(config["Conversion"].get(self.conversion))
+                        self.convert_image(file, o_name, self.conversion)
+
+                    else:
+                        print(f"Invalid File: {file}")
+        if f.is_dir():
+            for file in f.iterdir():
+                if self.check_format(file) is not None:
+                    o_name = os.path.join(self.destination, file.name)
+                    o_name = Path(o_name).with_suffix(config["conversion"].get(self.converstion))
+                    self.convert_image(file, o_name, self.conversion)
 
         return
 
