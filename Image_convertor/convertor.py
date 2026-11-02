@@ -37,7 +37,10 @@ class Picture:
         return config.get("Formats", {}).get(path.suffix.lower().lstrip("."))
 
     @staticmethod
-    def convert_image(i_name, o_name, image_format):
+    def convert_image(image_tuple : tuple) -> Path | None:
+        i_name = image_tuple[0]
+        o_name = image_tuple[1]
+        image_format = image_tuple[2]
         options = {
             "JPEG": {"quality": 100},
             "TIFF": {"compression": "tiff_lzw"},
@@ -77,36 +80,37 @@ class Picture:
 
     def _collect_files(self) -> list[Path]:
         raw_values: Iterable[str | Path]
+        files: list[tuple[Path, Path, str]] = []
 
         if isinstance(self.input_tuple, (str, Path)):
-            raw_values = [self.input_tuple]
+            path = Path(self.input_tuple)
+            if path.is_dir(): # Extra check
+                path_list = (sorted(child for child in path.iterdir() if child.is_file()))
+                for item in path_list:
+                    item = Path(item)
+                    if self.check_format(item) is not None:
+                        output_path = Path(self.destination, item.name)
+                        output_path = output_path.with_suffix(config["Conversion"].get(self.conversion))
+                        files.append((item, output_path, self.conversion))
+                    else:
+                        print(f'Invalid File! {item}')
+
         elif isinstance(self.input_tuple, (tuple, list, set)):
-            raw_values = self.input_tuple
+            for item in self.input_tuple:
+                item = Path(item)
+                if item.is_file(): # Extra check
+                    if self.check_format(item) is not None:
+                        output_path = Path(self.destination, item.name).with_suffix(config["Conversion"].get(self.conversion))
+                        files.append((item, output_path, self.conversion))
+                    else:
+                        print(f'Invalid File! {item}')
         else:
             return []
-
-        files: list[Path] = []
-
-        for item in raw_values:
-            path = Path(item)
-            if path.is_dir():
-                files.extend(sorted(child for child in path.iterdir() if child.is_file()))
-            elif path.is_file():
-                files.append(path)
 
         return files
 
     def convert(self):
         for file in self._collect_files():
-            if self.check_format(file) is None:
-                print(f"Invalid File: {file}")
-                continue
-
-            output_path = Path(self.destination, file.name)
-            output_path = output_path.with_suffix(config["Conversion"].get(self.conversion, ".png"))
-            self.convert_image(file, output_path, self.conversion)
-
+            self.convert_image(file)
         return
-
-
     

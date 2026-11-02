@@ -20,12 +20,19 @@ while True:
 
     print("choose destination: ")
     folder = select_path.FileSelector().select_folder()
+    if folder == "":
+        break
 
     conversion_format = input("Convert to:  ")
+    if conversion_format in ('e', 'exit', 'quit', 'q'):
+        print("Exiting the program.")
+        break
 
     if choice.lower() in ('file', 'image', 'photo', 'picture', 'pic'):
         print('choose your files: ')
         files = select_path.FileSelector().select_files()
+        if len(files) == 0:
+            break
 
         Picture(files, folder, conversion_format).convert()
 
