@@ -37,10 +37,10 @@ class Picture:
         return config.get("Formats", {}).get(path.suffix.lower().lstrip("."))
 
     @staticmethod
-    def convert_image(image_tuple : tuple) -> Path | None:
-        i_name = image_tuple[0]
-        o_name = image_tuple[1]
-        image_format = image_tuple[2]
+    def convert_image(image_tuple : dict) -> Path | None:
+        i_name = image_tuple["in"]
+        o_name = image_tuple["out"]
+        image_format = image_tuple["format"]
         options = {
             "JPEG": {"quality": 100},
             "TIFF": {"compression": "tiff_lzw"},
@@ -91,7 +91,7 @@ class Picture:
                     if self.check_format(item) is not None:
                         output_path = Path(self.destination, item.name)
                         output_path = output_path.with_suffix(config["Conversion"].get(self.conversion))
-                        files.append((item, output_path, self.conversion))
+                        files.append({"in": item, "out": output_path, "format": self.conversion})
                     else:
                         print(f'Invalid File! {item}')
 
@@ -101,7 +101,7 @@ class Picture:
                 if item.is_file(): # Extra check
                     if self.check_format(item) is not None:
                         output_path = Path(self.destination, item.name).with_suffix(config["Conversion"].get(self.conversion))
-                        files.append((item, output_path, self.conversion))
+                        files.append({"in": item, "out": output_path, "format": self.conversion})
                     else:
                         print(f'Invalid File! {item}')
         else:
